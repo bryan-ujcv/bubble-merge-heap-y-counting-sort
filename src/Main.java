@@ -8,7 +8,7 @@ public class Main {
 		Random random=new Random();
 		System.out.println("de que tamano desea el arreglo");
 		int x=miScanner.nextInt();
-		double arr[]=new double[x];
+		int arr[]=new int[x];
 		for(int i=0;i<arr.length;i++) {
 			int n = (int)(random.nextInt(1000));
 			arr[i]=n;
@@ -40,17 +40,41 @@ public class Main {
         merge.sort(arr, x, x);
         long duracionNSm=System.nanoTime()-inicioNSm;
         System.out.println("\nlo que se tarda el merge sort es: "+duracionNSm+" nano segundos");
+        
+        System.out.println("***********************************************************************");
+        
+        System.out.println("HEAP\n");
+        heap heap = new heap();
+        System.out.println("arreglo ordenado\n");
+        heap.imprimir(arr);
+        final double NSh=1000000000;
+        long inicioNSh=System.nanoTime();
+        heap.sort(arr);
+        long duracionNSh=System.nanoTime()-inicioNSh;
+        System.out.println("\nlo que se tarda el heap sort es: "+duracionNSh+" nano segundos");
+        
+        System.out.println("***********************************************************************");
+        
+        System.out.println("COUNTING\n");
+        counting counting = new counting();
+        System.out.println("arreglo ordenado\n");
+        counting.imprimir(arr);
+        final double NSc=1000000000;
+        long inicioNSc=System.nanoTime();
+        counting.sort(arr);
+        long duracionNSc=System.nanoTime()-inicioNSc;
+        System.out.println("\nlo que se tarda el counting sort es: "+duracionNSc+" nano segundos");
 
 	}
 
 }
 class bubble {
-	   void sort(double arr[]) {
-	        double n = arr.length;
+	   void sort(int[] arr) {
+	        int n = arr.length;
 	        for (int i = 0; i < n-1; i++) {
 	            for (int j = 0; j < n-i-1; j++) {
 	                if (arr[j] > arr[j+1]) {
-	                    double temp = arr[j];
+	                    int temp = arr[j];
 	                    arr[j] = arr[j+1];
 	                    arr[j+1] = temp;
 	                }
@@ -58,8 +82,8 @@ class bubble {
 	        }
 	    }
 	   
-	    void imprimir(double arr[]) {
-	        double n = arr.length;
+	    void imprimir(int[] arr) {
+	        int n = arr.length;
 	        for (int i=0; i<n; ++i) {
 	            System.out.print(arr[i] + " ");
 	        }
@@ -69,12 +93,12 @@ class bubble {
 	}
 
 class merge {
-	 void merge(double arr[], int l, int m, int r) {
+	 void merge(int[] arr, int l, int m, int r) {
 	        int n1 = m - l + 1;
 	        int n2 = r - m;
 	        /* arreglos temporales */
-	        double izq[] = new double [n1];
-	        double der[] = new double [n2];
+	        int izq[] = new int [n1];
+	        int der[] = new int [n2];
 	 
 	        for (int i=0; i<n1; ++i) {
 	            izq[i] = arr[l + i];
@@ -110,7 +134,7 @@ class merge {
 	        }
 	    }
 	 
-	    void sort(double arr[], int l, int r) {
+	    void sort(int[] arr, int l, int r) {
 	        if (l < r) {
 	            int m = (l+r)/2;
 	 
@@ -121,7 +145,7 @@ class merge {
 	        }
 	    }
 	 
-	    static void imprimir(double arr[]) {
+	    static void imprimir(int[] arr) {
 	        double n = arr.length;
 	        for (int i=0; i<n; ++i) {
 	            System.out.print(arr[i] + " ");
@@ -130,4 +154,95 @@ class merge {
 	    }
 	 
 	}
+
+class heap {
+	public void sort(int[] arr) {
+        int n = arr.length;
+        for (int i = n / 2 - 1; i >= 0; i--) {
+            heap(arr, n, i);
+        }
+ 
+        for (int i=n-1; i>=0; i--) {
+            int temp = arr[0];
+            arr[0] = arr[i];
+            arr[i] = temp;
+ 
+            heap(arr, i, 0);
+        }
+    }
+	
+	void heap(int arr[],int n,int i) {
+        int padre = i;  
+        int hijoizq = (2*i) + 1;  
+        int hijoder = (2*i) + 2;  
+ 
+        if (hijoizq < n && arr[hijoizq] > arr[padre]) padre = hijoizq;
+ 
+        if (hijoder < n && arr[hijoder] > arr[padre]) padre = hijoder;
+ 
+        if (padre != i) {
+            int swap = arr[i];
+            arr[i] = arr[padre];
+            arr[padre] = swap;
+            heap(arr, n, padre);
+        }
+    }
+ 
+    static void imprimir(int[] arr) {
+        double n = arr.length;
+        for (int i=0; i<n; ++i) {
+            System.out.print(arr[i]+" ");
+        }
+        System.out.println();
+    }
+ 
+}
+
+class counting{
+	 
+	  public  int[] sort(int[] arr) {
+	     
+	   int [] aux = new int[arr.length];
+	 
+	    
+	    int min = arr[0];
+	    int max = arr[0];
+	    for (int i = 1; i < arr.length; i++) {
+	      if (arr[i] < min) {
+	        min = arr[i];
+	      } else if (arr[i] > max) {
+	        max = arr[i];
+	      }
+	    }
+	 
+	    
+	    int[] counts = new int[max - min + 1];
+	 
+	    
+	    for (int i = 0;  i < arr.length; i++) {
+	      counts[arr[i] - min]++;
+	    }
+	 
+	    
+	    counts[0]--;
+	    for (int i = 1; i < counts.length; i++) {
+	      counts[i] = counts[i] + counts[i-1];
+	    }
+	  
+	    for (int i = arr.length - 1; i >= 0; i--) {
+	        aux[counts[arr[i] - min]--] = arr[i];
+	    }
+	 
+	    return aux;
+	  }
+	  void imprimir(int[] arr) {
+	        int n = arr.length;
+	        for (int i=0; i<n; ++i) {
+	            System.out.print(arr[i]+" ");
+	        }
+	        System.out.println();
+	    }
+	  
+ }
+
 
